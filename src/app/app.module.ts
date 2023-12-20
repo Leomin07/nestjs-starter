@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { configModuleOptions } from 'src/core/module-option';
-
-@Module({
-  imports: [ConfigModule.forRoot(configModuleOptions)],
-=======
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -36,6 +28,5 @@ import { AppLogger } from 'src/core/logger/logger.service';
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
     AppLogger,
   ],
->>>>>>> 93a3589 (init)
 })
 export class AppModule {}
