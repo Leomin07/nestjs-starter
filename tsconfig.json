@@ -16,44 +16,6 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false,
-    "paths": {
-      "@libs/helper": [
-        "libs/helper/src"
-      ],
-      "@libs/helper/*": [
-        "libs/helper/src/*"
-      ],
-      "@libs/core": [
-        "libs/core/src"
-      ],
-      "@libs/core/*": [
-        "libs/core/src/*"
-      ],
-      "@libs/utils": [
-        "libs/utils/src"
-      ],
-      "@libs/utils/*": [
-        "libs/utils/src/*"
-      ],
-      "@libs/cache": [
-        "libs/cache/src"
-      ],
-      "@libs/cache/*": [
-        "libs/cache/src/*"
-      ],
-      "@libs/database-typeorm": [
-        "libs/database-typeorm/src"
-      ],
-      "@libs/database-typeorm/*": [
-        "libs/database-typeorm/src/*"
-      ],
-      "libs/bullmq": [
-        "libs/bullmq/src"
-      ],
-      "libs/bullmq/*": [
-        "libs/bullmq/src/*"
-      ]
-    }
+    "noFallthroughCasesInSwitch": false
   }
 }

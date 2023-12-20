@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import { join } from 'path';
 
 dotenv.config({
-  path: join(process.cwd(), '/apps/app/.env'),
+  path: join(process.cwd(), '.env'),
 });
 
 export default (): any => ({

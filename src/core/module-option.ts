@@ -1,8 +1,8 @@
-import * as Joi from 'joi';
 import { ConfigModuleOptions } from '@nestjs/config/dist/interfaces';
+import * as Joi from 'joi';
 
-import configuration from './configuration';
 import { join } from 'path';
+import configuration from './configuration';
 
 export const configModuleOptions: ConfigModuleOptions = {
   validationSchema: Joi.object({
@@ -15,8 +15,7 @@ export const configModuleOptions: ConfigModuleOptions = {
     REDIS_PORT: Joi.number().required(),
     REDIS_HOST: Joi.string().required(),
     REDIS_URL: Joi.string().required(),
-    REDIS_USERNAME: Joi.string().required(),
-    MONGO_URI: Joi.string().required(),
+    // MONGO_URI: Joi.string().required(),
   }),
   load: [configuration],
   validationOptions: {
