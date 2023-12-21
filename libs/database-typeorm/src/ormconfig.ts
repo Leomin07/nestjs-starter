@@ -1,6 +1,5 @@
-import { DataSource, DataSourceOptions } from 'typeorm';
 import 'dotenv/config';
-import { join } from 'path';
+import { DataSource, DataSourceOptions } from 'typeorm';
 import { User } from './entities/User';
 import { Migrations1698066317364 } from './migrations/1698066317364-migrations';
 
@@ -29,19 +28,3 @@ dataSourceOptions
   .initialize()
   .then(() => console.log('Data Source has been initialized'))
   .catch((error) => console.error('Error initializing Data Source', error));
-
-console.log({
-  type: 'mysql',
-  host: process.env.MYSQL_HOST,
-  port: Number(process.env.MYSQL_PORT),
-  username: process.env.MYSQL_USERNAME,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  migrationsRun: true,
-  entities: [User],
-  migrations: [
-    join(__dirname + '../../database-typeorm/migrations/*{.ts,.js}'),
-  ],
-  synchronize: false,
-  logging: true,
-});
