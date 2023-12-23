@@ -1,11 +1,13 @@
 import { CommonStatus } from 'src/helpers/enum';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class BaseModel {
-  @PrimaryGeneratedColumn()
+  @Index()
+  @PrimaryGeneratedColumn({ name: 'id', type: 'bigint', unsigned: true })
   id: number;
 
+  @Index()
   @Column({
     type: 'smallint',
     default: CommonStatus.ACTIVE,
@@ -19,12 +21,12 @@ export class BaseModel {
     default: () => 'CURRENT_TIMESTAMP(6)',
     nullable: false,
   })
-  createAt: string;
+  createAt: Date;
 
   @Column({
     type: 'timestamp',
     onUpdate: 'CURRENT_TIMESTAMP(6)',
     nullable: false,
   })
-  updateAt: string;
+  updateAt: Date;
 }

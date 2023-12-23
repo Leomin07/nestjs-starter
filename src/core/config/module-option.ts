@@ -13,6 +13,7 @@ export const configModuleOptions: ConfigModuleOptions = {
     VERSION_APP: Joi.string().required(),
     DESCRIPTION_APP: Joi.string().required(),
     API_V1_STR: Joi.string().required(),
+    API_DOCS_STR: Joi.string().required(),
     CACHE_MAX: Joi.number().required(),
     CACHE_TTL: Joi.number().required(),
     REDIS_PORT: Joi.number().required(),
@@ -22,6 +23,9 @@ export const configModuleOptions: ConfigModuleOptions = {
     PG_PASSWORD: Joi.string().required(),
     PG_DATABASE_NAME: Joi.string().required(),
     PG_PORT: Joi.number().required(),
+    ONESIGNAL_APP_ID: Joi.string().required(),
+    ONESIGNAL_REST_API_KEY: Joi.string().required(),
+    ONESIGNAL_USER_KEY: Joi.string().required(),
   }),
   load: [configuration],
   validationOptions: {

@@ -10,6 +10,7 @@ import { configModuleOptions } from 'src/core/config/module-option';
 import { AllExceptionsFilter } from 'src/core/filters/all-exceptions.filter';
 import { LoggingInterceptor } from 'src/core/interceptors/logging.interceptor';
 import { AppLogger } from 'src/core/logger/logger.service';
+import { User } from 'src/database/entities/User';
 
 @Module({
   imports: [
@@ -42,10 +43,6 @@ import { AppLogger } from 'src/core/logger/logger.service';
     /* -------------------------------------------------------------------------- */
     /*                                   bullmq                                   */
     /* -------------------------------------------------------------------------- */
-    BullModule.registerQueue({
-      name: 'image:optimize',
-      prefix: 'flash-cards',
-    }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
@@ -53,9 +50,9 @@ import { AppLogger } from 'src/core/logger/logger.service';
         host: configService.get('PG_HOST'),
         port: configService.get('PG_PORT'),
         username: configService.get('PG_USERNAME'),
-        password: configService.get('<PASSWORD>'),
+        password: configService.get('PG_PASSWORD'),
         database: configService.get('PG_DATABASE'),
-        entities: [],
+        entities: [User],
         synchronize: false,
       }),
     }),
