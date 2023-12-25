@@ -22,8 +22,12 @@ export class AppLogger {
           format: 'YYYY-MM-DD hh:mm:ss.SSS A',
         }),
         align(),
-        printf((info) => `[${info.timestamp}] ${info.level}: ${info.message}`),
+        printf(
+          (info) =>
+            `[${info.timestamp}] ${info.level}: ${info.message} - requestId:${info.ctx.requestID}`,
+        ),
       ),
+
       transports: [new transports.Console()],
     });
   }

@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
 import { VALIDATION_PIPE_OPTIONS } from './core/constants';
+import { RequestIdMiddleware } from './core/middleware/request-id.middleware';
 
 async function bootstrap() {
   const logger = new Logger();
@@ -16,7 +17,7 @@ async function bootstrap() {
   app.setGlobalPrefix(configService.get('API_V1_STR'));
 
   app.useGlobalPipes(new ValidationPipe(VALIDATION_PIPE_OPTIONS));
-  // app.use(RequestIdMiddleware);
+  app.use(RequestIdMiddleware);
   app.enableCors();
 
   /** Swagger configuration*/
