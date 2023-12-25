@@ -8,6 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 
+import { REQUEST_ID_TOKEN_HEADER } from '../constants';
 import { BaseApiException } from '../exceptions/base-api.exception';
 import { AppLogger } from '../logger/logger.service';
 import { createRequestContext } from '../request-context/util';
@@ -29,7 +30,7 @@ export class AllExceptionsFilter<T> implements ExceptionFilter {
 
     const path = req.url;
     const timestamp = new Date().toISOString();
-    // const requestId = req.headers[REQUEST_ID_TOKEN_HEADER];
+    const requestId = req.headers[REQUEST_ID_TOKEN_HEADER];
     const requestContext = createRequestContext(req);
 
     let stack: any;
@@ -73,7 +74,7 @@ export class AllExceptionsFilter<T> implements ExceptionFilter {
       details,
       // Additional meta added by us.
       path,
-      // requestId,
+      requestId,
       timestamp,
     };
 
