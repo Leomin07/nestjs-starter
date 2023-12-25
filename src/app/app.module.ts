@@ -59,7 +59,6 @@ import { Environment } from 'src/helpers/enum';
         database: configService.get('PG_DATABASE'),
         entities: [User, Notification, NotificationMember],
         synchronize: false,
-        logging: configService.get('NODE_ENV') !== Environment.Production,
       }),
     }),
   ],
