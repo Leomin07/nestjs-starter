@@ -27,6 +27,7 @@ export default (): any => ({
     PG_PASSWORD: process.env.PG_PASSWORD,
     PG_DATABASE_NAME: process.env.PG_DATABASE_NAME,
     PG_PORT: process.env.PG_PORT,
+    PG_HOST: process.env.PG_HOST,
   },
   ONESIGNAL: {
     ONESIGNAL_APP_ID: process.env.ONESIGNAL_APP_ID,

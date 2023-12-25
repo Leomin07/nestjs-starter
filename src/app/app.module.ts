@@ -13,7 +13,7 @@ import { TransformResponseInterceptor } from 'src/core/interceptors/transform-re
 import { AppLogger } from 'src/core/logger/logger.service';
 import { LoggerMiddleware } from 'src/core/middleware/logger.middlware';
 import { Notification } from 'src/database/entities/Notification';
-import { NotificationMember } from 'src/database/entities/NotificationMemeber';
+import { NotificationMember } from 'src/database/entities/NotificationMember';
 import { User } from 'src/database/entities/User';
 import { Environment } from 'src/helpers/enum';
 

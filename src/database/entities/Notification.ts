@@ -1,13 +1,9 @@
 import { Column, DeleteDateColumn, Entity, Index } from 'typeorm';
-import { CommonStatus, NotificationTargetType } from '../../helpers/enum';
+import { NotificationTargetType } from '../../helpers/enum';
 import { BaseModel } from './BaseModel';
 
 @Entity('notification')
 export class Notification extends BaseModel {
-  @Index()
-  @Column({ name: 'status', type: 'smallint', default: CommonStatus.ACTIVE })
-  status: number;
-
   @Column({ name: 'type', type: 'smallint', nullable: true })
   type?: number;
 
