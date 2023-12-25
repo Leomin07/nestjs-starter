@@ -1,6 +1,6 @@
 import { BullModule } from '@nestjs/bullmq';
 import { CacheModule } from '@nestjs/cache-manager';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -9,8 +9,11 @@ import type { RedisClientOptions } from 'redis';
 import { configModuleOptions } from 'src/core/config/module-option';
 import { AllExceptionsFilter } from 'src/core/filters/all-exceptions.filter';
 import { LoggingInterceptor } from 'src/core/interceptors/logging.interceptor';
+import { TransformResponseInterceptor } from 'src/core/interceptors/transform-res.interceptor';
 import { AppLogger } from 'src/core/logger/logger.service';
+import { LoggerMiddleware } from 'src/core/middleware/logger.middlware';
 import { User } from 'src/database/entities/User';
+import { Environment } from 'src/helpers/enum';
 
 @Module({
   imports: [
@@ -59,8 +62,19 @@ import { User } from 'src/database/entities/User';
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
+    { provide: APP_INTERCEPTOR, useClass: TransformResponseInterceptor },
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
     AppLogger,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private configService: ConfigService) {}
+
+  configure(consumer: MiddlewareConsumer) {
+    const env = this.configService.get<Environment>('env');
+
+    if (!['production', 'prd'].includes(env)) {
+      consumer.apply(LoggerMiddleware).forRoutes('*');
+    }
+  }
+}

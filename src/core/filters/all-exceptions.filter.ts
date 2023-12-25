@@ -11,7 +11,6 @@ import { Request, Response } from 'express';
 import { BaseApiException } from '../exceptions/base-api.exception';
 import { AppLogger } from '../logger/logger.service';
 import { createRequestContext } from '../request-context/util';
-import { REQUEST_ID_TOKEN_HEADER } from '../constants';
 
 @Catch()
 export class AllExceptionsFilter<T> implements ExceptionFilter {
@@ -30,7 +29,7 @@ export class AllExceptionsFilter<T> implements ExceptionFilter {
 
     const path = req.url;
     const timestamp = new Date().toISOString();
-    const requestId = req.headers[REQUEST_ID_TOKEN_HEADER];
+    // const requestId = req.headers[REQUEST_ID_TOKEN_HEADER];
     const requestContext = createRequestContext(req);
 
     let stack: any;
@@ -74,9 +73,10 @@ export class AllExceptionsFilter<T> implements ExceptionFilter {
       details,
       // Additional meta added by us.
       path,
-      requestId,
+      // requestId,
       timestamp,
     };
+
     this.logger.warn(requestContext, error.message, {
       error,
       stack,
