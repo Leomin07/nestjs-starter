@@ -1,14 +1,14 @@
-import { CommonStatus, NotificationTargetType } from 'src/helpers/enum';
 import { Column, DeleteDateColumn, Entity, Index } from 'typeorm';
-import { BaseModel } from './BaseEntity';
+import { CommonStatus, NotificationTargetType } from '../../helpers/enum';
+import { BaseModel } from './BaseModel';
 
 @Entity('notification')
 export class Notification extends BaseModel {
   @Index()
-  @Column({ name: 'status', type: 'tinyint', default: CommonStatus.ACTIVE })
+  @Column({ name: 'status', type: 'smallint', default: CommonStatus.ACTIVE })
   status: number;
 
-  @Column({ name: 'type', type: 'tinyint', nullable: true })
+  @Column({ name: 'type', type: 'smallint', nullable: true })
   type?: number;
 
   @Column({ name: 'title', type: 'varchar', length: '500', nullable: true })
@@ -27,11 +27,11 @@ export class Notification extends BaseModel {
   redirect_id: number;
 
   @Index()
-  @Column({ name: 'redirect_type', type: 'tinyint', nullable: true })
+  @Column({ name: 'redirect_type', type: 'smallint', nullable: true })
   redirectType?: number;
 
   @Index()
-  @Column({ name: 'target_type', type: 'tinyint', default: 1 })
+  @Column({ name: 'target_type', type: 'smallint', default: 1 })
   targetType: NotificationTargetType;
 
   @Column({ name: 'uuid', type: 'uuid', nullable: true })
@@ -66,6 +66,6 @@ export class Notification extends BaseModel {
   })
   updatedBy?: number;
 
-  @DeleteDateColumn({ name: 'deleted_at', type: 'datetime', nullable: true })
-  deletedAt?: string;
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp', nullable: true })
+  deletedAt?: Date;
 }

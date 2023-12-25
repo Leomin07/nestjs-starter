@@ -1,5 +1,5 @@
-import { CommonStatus } from 'src/helpers/enum';
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { CommonStatus } from '../../helpers/enum';
 
 @Entity()
 export class BaseModel {

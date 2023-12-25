@@ -1,4 +1,3 @@
-import { CommonStatus, ReadNotification } from 'src/helpers/enum';
 import {
   Column,
   CreateDateColumn,
@@ -8,6 +7,7 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { CommonStatus, ReadNotification } from '../../helpers/enum';
 
 @Entity('notification_member')
 export class NotificationMember {
@@ -32,7 +32,7 @@ export class NotificationMember {
   @Index()
   @Column({
     name: 'is_read',
-    type: 'tinyint',
+    type: 'smallint',
     default: ReadNotification.UNREAD,
   })
   isRead: ReadNotification;
@@ -40,7 +40,7 @@ export class NotificationMember {
   @Index()
   @Column({
     name: 'status',
-    type: 'tinyint',
+    type: 'smallint',
     default: CommonStatus.ACTIVE,
   })
   status: number;
@@ -57,6 +57,6 @@ export class NotificationMember {
   })
   updatedAt?: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at', type: 'datetime', nullable: true })
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp', nullable: true })
   deletedAt?: Date;
 }

@@ -12,6 +12,8 @@ import { LoggingInterceptor } from 'src/core/interceptors/logging.interceptor';
 import { TransformResponseInterceptor } from 'src/core/interceptors/transform-res.interceptor';
 import { AppLogger } from 'src/core/logger/logger.service';
 import { LoggerMiddleware } from 'src/core/middleware/logger.middlware';
+import { Notification } from 'src/database/entities/Notification';
+import { NotificationMember } from 'src/database/entities/NotificationMemeber';
 import { User } from 'src/database/entities/User';
 import { Environment } from 'src/helpers/enum';
 
@@ -44,7 +46,7 @@ import { Environment } from 'src/helpers/enum';
       }),
     }),
     /* -------------------------------------------------------------------------- */
-    /*                                   bullmq                                   */
+    /*                                   Typeorm                                   */
     /* -------------------------------------------------------------------------- */
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -55,11 +57,14 @@ import { Environment } from 'src/helpers/enum';
         username: configService.get('PG_USERNAME'),
         password: configService.get('PG_PASSWORD'),
         database: configService.get('PG_DATABASE'),
-        entities: [User],
+        entities: [User, Notification, NotificationMember],
         synchronize: false,
       }),
     }),
   ],
+  /* -------------------------------------------------------------------------- */
+  /*                                  Providers                                 */
+  /* -------------------------------------------------------------------------- */
   providers: [
     { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
     { provide: APP_INTERCEPTOR, useClass: TransformResponseInterceptor },
