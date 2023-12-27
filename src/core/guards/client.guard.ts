@@ -16,7 +16,6 @@ export class ClientGuard implements CanActivate {
     if (isPublic) return true;
 
     const request = context.switchToHttp().getRequest() as Request;
-    console.log('ClientGuard -> canActivate -> request:', request?.user);
 
     return request?.user?.userType === UserType.CLIENT;
   }
