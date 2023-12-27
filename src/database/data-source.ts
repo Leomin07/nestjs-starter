@@ -10,7 +10,7 @@ export default new DataSource({
   port: configService.get('PG_PORT'),
   username: configService.get('PG_USERNAME'),
   password: configService.get('PG_PASSWORD'),
-  database: configService.get('PG_DATABASE'),
+  database: configService.get('PG_DATABASE_NAME'),
   entities: ['dist/database/entities/*{.js,.ts}'],
   migrations: ['dist/database/migrations/*{.js,.ts}'],
   synchronize: false,

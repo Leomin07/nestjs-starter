@@ -1,4 +1,4 @@
-import { UserAccessTokenClaims } from '../types';
+import { UserAccessTokenClaims } from '../../types';
 
 export class RequestContext {
   public requestID: string;

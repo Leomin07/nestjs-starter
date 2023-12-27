@@ -3,19 +3,16 @@ import { BaseModel } from './BaseModel';
 
 @Entity('user')
 export class User extends BaseModel {
-  @Column({
-    type: 'varchar',
-    length: 255,
-    nullable: false,
-  })
-  email: string;
+  @Column({ name: 'role_id', type: 'smallint', comment: 'Role của admin' })
+  roleId: number;
 
   @Column({
     type: 'varchar',
     length: 255,
     nullable: false,
+    comment: 'FullName or name',
   })
-  fullName: string;
+  name: string;
 
   @Column({
     type: 'varchar',
@@ -23,4 +20,30 @@ export class User extends BaseModel {
     nullable: false,
   })
   phone: string;
+
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: false,
+    select: false,
+  })
+  password?: string;
+
+  @Column({
+    name: 'is_super_admin',
+    type: 'smallint',
+    default: 0,
+    comment: '1: Active, 0:A Active',
+  })
+  isSuperAdmin?: number;
+
+  @Column({
+    name: 'refresh_token',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+    select: false,
+    comment: 'JWT token',
+  })
+  refreshToken?: string;
 }

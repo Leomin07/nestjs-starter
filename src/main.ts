@@ -2,6 +2,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { AppModule } from './app/app.module';
 import { VALIDATION_PIPE_OPTIONS } from './core/constants';
 import { RequestIdMiddleware } from './core/middleware/request-id.middleware';
@@ -19,6 +20,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe(VALIDATION_PIPE_OPTIONS));
   app.use(RequestIdMiddleware);
   app.enableCors();
+  app.use(helmet());
 
   /** Swagger configuration*/
   const options = new DocumentBuilder()

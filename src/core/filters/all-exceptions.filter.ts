@@ -4,6 +4,7 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
@@ -22,7 +23,7 @@ export class AllExceptionsFilter<T> implements ExceptionFilter {
   ) {
     this.logger.setContext(AllExceptionsFilter.name);
   }
-
+  private readonly loggers = new Logger();
   catch(exception: T, host: ArgumentsHost): any {
     const ctx = host.switchToHttp();
     const req: Request = ctx.getRequest<Request>();
@@ -39,7 +40,7 @@ export class AllExceptionsFilter<T> implements ExceptionFilter {
     let message: string;
     let details: string | Record<string, any>;
     // TODO : Based on language value in header, return a localized message.
-    const acceptedLanguage = 'ja';
+    // const acceptedLanguage = 'en';
     let localizedMessage: string;
 
     // TODO : Refactor the below cases into a switch case and tidy up error response creation.
@@ -47,7 +48,7 @@ export class AllExceptionsFilter<T> implements ExceptionFilter {
       statusCode = exception.getStatus();
       errorName = exception.constructor.name;
       message = exception.message;
-      localizedMessage = exception.localizedMessage[acceptedLanguage];
+      // localizedMessage = exception.localizedMessage[acceptedLanguage];
       details = exception.details || exception.getResponse();
     } else if (exception instanceof HttpException) {
       statusCode = exception.getStatus();
@@ -78,10 +79,11 @@ export class AllExceptionsFilter<T> implements ExceptionFilter {
       timestamp,
     };
 
-    this.logger.warn(requestContext, error.message, {
-      error,
-      stack,
-    });
+    this.loggers.error(error.message, stack, requestContext);
+    // this.logger.error(requestContext, error.message, {
+    //   error,
+    //   stack,
+    // });
 
     // Suppress original internal server error details in prod mode
     const isProMood = this.config.get<string>('NODE_ENV') !== 'development';

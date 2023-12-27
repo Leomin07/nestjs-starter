@@ -3,7 +3,7 @@ import {
   FORWARDED_FOR_TOKEN_HEADER,
   REQUEST_ID_TOKEN_HEADER,
 } from 'src/core/constants';
-import { UserAccessTokenClaims } from 'src/core/types';
+import { UserAccessTokenClaims } from 'src/types';
 import { IRequest } from '../interface';
 import { RequestContext } from '../request-context.dto';
 
