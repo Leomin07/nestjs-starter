@@ -1,5 +1,4 @@
 import {
-  IsDate,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -33,7 +32,7 @@ export class RegisterDto {
   @IsEnum(Gender)
   gender: Gender;
 
-  @IsDate()
+  @IsString()
   @IsNotEmpty()
-  birthday: Date;
+  birthday: string;
 }
