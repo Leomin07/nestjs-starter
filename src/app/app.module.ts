@@ -11,10 +11,9 @@ import { LoggingInterceptor } from 'src/core/interceptors/logging.interceptor';
 import { TransformResponseInterceptor } from 'src/core/interceptors/transform-res.interceptor';
 import { AppLogger } from 'src/core/logger/logger.service';
 import { LoggerMiddleware } from 'src/core/middleware/logger.middlware';
-import { Member } from 'src/database/entities/Member';
 import { Notification } from 'src/database/entities/Notification';
 import { NotificationMember } from 'src/database/entities/NotificationMember';
-import { VerificationCode } from 'src/database/entities/VerificationCode';
+import { User } from 'src/database/entities/User';
 import { Environment } from 'src/helpers/enum';
 import { JwtAuthenticationModule } from 'src/libs/jwt-authentication/jwt-authentication.module';
 import { GlobalCacheModule } from '../libs/cache/cache.module';
@@ -60,7 +59,7 @@ import { AuthModule } from './auth/auth.module';
         username: configService.get('PG_USERNAME'),
         password: configService.get('PG_PASSWORD'),
         database: configService.get('PG_DATABASE_NAME'),
-        entities: [Notification, NotificationMember, Member, VerificationCode],
+        entities: [User, Notification, NotificationMember],
         synchronize: false,
         logging: configService.get('NODE_ENV') !== Environment.Production,
       }),

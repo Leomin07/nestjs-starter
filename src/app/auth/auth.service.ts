@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Exception } from 'src/core/exceptions/base-api.exception';
 import { Member } from 'src/database/entities/Member';
+import { User } from 'src/database/entities/User';
 import { VerificationCode } from 'src/database/entities/VerificationCode';
 import {
   ErrorMessage,
@@ -13,6 +14,7 @@ import {
 import { randomOTP, randomString } from 'src/helpers/utils';
 import { JwtAuthenticationService } from 'src/libs/jwt-authentication/jwt-authentication.service';
 import { DataSource, MoreThan, Repository } from 'typeorm';
+import { ChangePhoneNumberDto } from './dto/change-phone-number.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { RequestVerificationCodeDto } from './dto/request-verification-code.dto';
@@ -22,6 +24,8 @@ export class AuthService {
   constructor(
     @InjectRepository(Member)
     private readonly memberRepository: Repository<Member>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     @InjectRepository(VerificationCode)
     private readonly verificationCodeRepository: Repository<VerificationCode>,
     private readonly dataSource: DataSource,
@@ -128,6 +132,7 @@ export class AuthService {
         select: ['id', 'status'],
       });
 
+      return member;
       if (member) {
         throw new Exception(
           ErrorMessage.Phone_Already_Exists,
@@ -136,71 +141,67 @@ export class AuthService {
       }
     }
 
-    const codeObject = await this.verificationCodeRepository.findOne({
-      where: {
-        phone,
-        type,
-        status: VerificationCodeStatus.ACTIVE,
-        expireRetry: MoreThan(new Date(currentMs).toISOString()),
-      },
-    });
+    // const codeObject = await this.verificationCodeRepository.findOne({
+    //   where: {
+    //     phone,
+    //     type,
+    //     status: VerificationCodeStatus.ACTIVE,
+    //     expireRetry: MoreThan(new Date(currentMs).toISOString()),
+    //   },
+    // });
 
-    if (codeObject) {
-      if (codeObject.retryCount >= 5) {
-        throw new Exception(
-          ErrorMessage.Maximum_Retry_Verification_Code,
-          `Block until: ${codeObject.expireRetry}(15 minutes from the first call)`,
-        );
-      }
+    // if (codeObject) {
+    //   if (codeObject.retryCount >= 5) {
+    //     throw new Exception(
+    //       ErrorMessage.Maximum_Retry_Verification_Code,
+    //       `Block until: ${codeObject.expireRetry}(15 minutes from the first call)`,
+    //     );
+    //   }
 
-      if (codeObject.expireAt) {
-        const retryAtMs = new Date(codeObject.retryAt).getTime();
+    //   if (codeObject.expireAt) {
+    //     const retryAtMs = new Date(codeObject.retryAt).getTime();
 
-        if (
-          retryAtMs + this.configService.get('DELAY_BETWEEN_RETRY') >
-          currentMs
-        ) {
-          throw new Exception(
-            ErrorMessage.Delay_Between_Retry_Required,
-            `Delay between retry is ${
-              this.configService.get('DELAY_BETWEEN_RETRY') / 1000
-            } s, next time available from ${new Date(
-              retryAtMs + this.configService.get('DELAY_BETWEEN_RETRY'),
-            ).toISOString()}`,
-          );
-        }
-      }
+    //     if (
+    //       retryAtMs + this.configService.get('DELAY_BETWEEN_RETRY') >
+    //       currentMs
+    //     ) {
+    //       throw new Exception(
+    //         ErrorMessage.Delay_Between_Retry_Required,
+    //         `Delay between retry is ${
+    //           this.configService.get('DELAY_BETWEEN_RETRY') / 1000
+    //         } s, next time available from ${new Date(
+    //           retryAtMs + this.configService.get('DELAY_BETWEEN_RETRY'),
+    //         ).toISOString()}`,
+    //       );
+    //     }
+    //   }
 
-      await this.verificationCodeRepository.update(
-        { id: codeObject.id },
-        {
-          retryCount: codeObject.retryCount + 1,
-          code,
-          retryAt: new Date(currentMs).toISOString(),
-        },
-      );
-    }
+    //   await this.verificationCodeRepository.update(
+    //     { id: codeObject.id },
+    //     {
+    //       retryCount: codeObject.retryCount + 1,
+    //       code,
+    //       retryAt: new Date(currentMs).toISOString(),
+    //     },
+    //   );
+    // }
 
-    const expireAt = new Date(
-      currentMs + this.configService.get('VERIFY_CODE_TTL'),
-    ).toISOString();
-    const expireRetry = new Date(
-      currentMs + this.configService.get('CONFIG_RETRY_BLOCK'),
-    ).toISOString();
-    const useAt = new Date(currentMs).toISOString();
+    // const expireAt = new Date(
+    //   currentMs + this.configService.get('VERIFY_CODE_TTL'),
+    // ).toISOString();
+    // const expireRetry = new Date(
+    //   currentMs + this.configService.get('CONFIG_RETRY_BLOCK'),
+    // ).toISOString();
 
-    if (!codeObject) {
-      await this.verificationCodeRepository.save({
-        phone,
-        code,
-        type,
-        expireAt,
-        expireRetry,
-        useAt,
-      });
-    }
-
-    return code;
+    // if (!codeObject) {
+    //   await this.verificationCodeRepository.save({
+    //     phone,
+    //     code,
+    //     type,
+    //     expireAt,
+    //     expireRetry,
+    //   });
+    // }
   }
 
   async fetchRegisterCode(code: string) {
@@ -303,17 +304,34 @@ export class AuthService {
       }
 
       const member = await memberRepository.findOne({
-        where: [{ phone: params.phone }],
-        select: ['id', 'phone'],
+        where: [{ phone: params.phone }, { code: params.code }],
+        select: ['id', 'phone', 'code'],
       });
 
       if (member?.phone === params.phone) {
         throw new Exception(ErrorMessage.Phone_Already_Exists);
       }
 
-      const newMember = await memberRepository.save(params);
+      if (member && member?.code === params.code) {
+        throw new Exception(ErrorMessage.Code_Already_Exists);
+      }
 
-      return this.generateToken(memberRepository, newMember);
+      const changePhoneCode =
+        await this.createChangePhoneCode(memberRepository);
+
+      Object.assign(params, {
+        changePhoneCode,
+      });
+      // const newMember = await memberRepository.save(params);
+
+      // if (!params.code) {
+      //   await memberRepository.update(
+      //     { id: newMember.id },
+      //     { code: String(newMember.id) },
+      //   );
+      // }
+
+      // return this.generateToken(memberRepository, newMember);
     });
   }
 
@@ -337,5 +355,41 @@ export class AuthService {
 
     const result = await this.generateToken(this.memberRepository, user);
     return result?.token;
+  }
+
+  async changePhoneNumber(params: ChangePhoneNumberDto) {
+    return await this.dataSource.transaction(async (transaction) => {
+      const verificationCodeRepository =
+        transaction.getRepository(VerificationCode);
+      const memberRepository = transaction.getRepository(Member);
+
+      await this.checkVerificationCode(
+        verificationCodeRepository,
+        params.phone,
+        params.code,
+        VerificationCodeType.CHANGE_PHONE_NUMBER,
+      );
+
+      const hasMember = await this.memberRepository.findOne({
+        where: { phone: params.phone },
+        select: ['id', 'refreshToken'],
+      });
+
+      if (hasMember) {
+        throw new Exception(ErrorMessage.Phone_Already_Exists);
+      }
+
+      const member = await this.memberRepository.findOne({
+        where: { changePhoneCode: params.changePhoneCode },
+        select: ['id', 'refreshToken'],
+      });
+
+      await memberRepository.update(
+        { changePhoneCode: params.changePhoneCode },
+        { phone: params.phone },
+      );
+
+      return await this.generateToken(memberRepository, member);
+    });
   }
 }

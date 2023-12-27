@@ -51,27 +51,12 @@ export class Member extends BaseModel {
   changePhoneCode: string;
 
   @Column({
-    name: 'is_super_admin',
-    type: 'smallint',
-    default: 0,
-    nullable: true,
-    comment: '1: Active, 0:A Active',
-  })
-  isSuperAdmin?: number;
-
-  @Column({
-    name: 'role_id',
-    type: 'smallint',
-    comment: 'Role for admin',
-    nullable: true,
-  })
-  roleId?: number;
-
-  @Column({
+    name: 'code',
     type: 'varchar',
-    length: 255,
+    length: 20,
     nullable: true,
-    select: false,
+    unique: true,
+    comment: 'Code for member',
   })
-  password?: string;
+  code: string;
 }

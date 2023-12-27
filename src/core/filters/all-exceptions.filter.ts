@@ -4,6 +4,7 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
@@ -22,7 +23,7 @@ export class AllExceptionsFilter<T> implements ExceptionFilter {
   ) {
     this.logger.setContext(AllExceptionsFilter.name);
   }
-  // private readonly logger = new Logger();
+  private readonly loggers = new Logger();
   catch(exception: T, host: ArgumentsHost): any {
     const ctx = host.switchToHttp();
     const req: Request = ctx.getRequest<Request>();
@@ -78,11 +79,11 @@ export class AllExceptionsFilter<T> implements ExceptionFilter {
       timestamp,
     };
 
-    // this.loggers.error(error.message, stack, requestContext);
-    this.logger.error(requestContext, error.message, {
-      error,
-      stack,
-    });
+    this.loggers.error(error.message, stack, requestContext);
+    // this.logger.error(requestContext, error.message, {
+    //   error,
+    //   stack,
+    // });
 
     // Suppress original internal server error details in prod mode
     const isProMood = this.config.get<string>('NODE_ENV') !== 'development';

@@ -1,11 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { CommonStatus } from '../../helpers/enum';
 
 @Entity()
@@ -23,17 +16,17 @@ export class BaseModel {
   })
   status: CommonStatus;
 
-  @CreateDateColumn({
+  @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
     nullable: false,
   })
-  createAt: string;
+  createAt: Date;
 
-  @UpdateDateColumn({
+  @Column({
     type: 'timestamp',
     onUpdate: 'CURRENT_TIMESTAMP(6)',
-    nullable: true,
+    nullable: false,
   })
-  updateAt: string;
+  updateAt: Date;
 }
