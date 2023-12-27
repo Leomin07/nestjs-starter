@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEnum,
   IsNotEmpty,
@@ -8,15 +9,18 @@ import {
 import { VerificationCodeType } from 'src/helpers/enum';
 
 export class RequestVerificationCodeDto {
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   @Length(0, 20)
   phone: string;
 
+  @ApiProperty({ enum: VerificationCodeType })
   @IsNotEmpty()
   @IsEnum(VerificationCodeType)
   type: VerificationCodeType;
 
+  @ApiProperty()
   @IsOptional()
   @IsString()
   @Length(0, 6)

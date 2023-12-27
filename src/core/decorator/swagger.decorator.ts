@@ -1,3 +1,4 @@
+import { LiteralObject } from '@nestjs/cache-manager';
 import { applyDecorators, Controller, Post, Put } from '@nestjs/common';
 import {
   ApiBody,
@@ -12,7 +13,11 @@ export function CustomController(name: string) {
   return applyDecorators(ApiTags(name), Controller(name));
 }
 
-export const CustomPost = (name: string, body: any, response?: any) => {
+export const CustomPost = (
+  name: string,
+  body: any | LiteralObject,
+  response?: any,
+) => {
   return applyDecorators(
     Post(name),
     ApiCreatedResponse({ description: 'Success', type: response }),
