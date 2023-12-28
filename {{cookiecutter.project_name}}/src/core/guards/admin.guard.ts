@@ -37,7 +37,7 @@ export class ClientGuard implements CanActivate {
     }
 
     return [UserType.SUPER_ADMIN, UserType.ADMIN].includes(
-      request.user.userType as any,
+      request?.user?.userType as any,
     );
   }
 }
