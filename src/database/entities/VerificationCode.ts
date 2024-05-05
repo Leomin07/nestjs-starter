@@ -26,7 +26,7 @@ export class VerificationCode {
 
   @Column({
     name: 'type',
-    type: 'smallint',
+    type: 'tinyint',
     comment: '1: Register, 2: Change device',
     nullable: false,
   })
@@ -42,7 +42,7 @@ export class VerificationCode {
 
   @Column({
     name: 'retry_count',
-    type: 'smallint',
+    type: 'tinyint',
     default: 0,
     comment: 'Max: 5',
   })
@@ -50,7 +50,7 @@ export class VerificationCode {
 
   @Column({
     name: 'status',
-    type: 'smallint',
+    type: 'tinyint',
     comment: '1: active, 0: inactive',
     default: 1,
   })
@@ -76,7 +76,7 @@ export class VerificationCode {
   @Column({
     name: 'retry_at',
     type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
+    default: () => 'CURRENT_TIMESTAMP',
   })
   retryAt: string;
 

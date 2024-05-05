@@ -52,7 +52,7 @@ export class Member extends BaseModel {
 
   @Column({
     name: 'is_super_admin',
-    type: 'smallint',
+    type: 'tinyint',
     default: 0,
     nullable: true,
     comment: '1: Active, 0:A Active',
@@ -61,7 +61,7 @@ export class Member extends BaseModel {
 
   @Column({
     name: 'role_id',
-    type: 'smallint',
+    type: 'tinyint',
     comment: 'Role for admin',
     nullable: true,
   })

@@ -18,9 +18,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "migration:show": " typeorm-ts-node-commonjs -d ./src/database/data-source.ts migration:show",
-    "migration:generate": "npm run build & typeorm-ts-node-commonjs -d ./src/database/data-source.ts migration:generate ./src/database/migrations/migration",
-    "migration:run": "npm run build & typeorm-ts-node-commonjs -d ./src/database/data-source.ts migration:run",
+    "migration:show": "typeorm-ts-node-commonjs -d ./src/database/data-source.ts migration:show",
+    "migration:generate": "typeorm-ts-node-commonjs -d ./src/database/data-source.ts migration:generate ./src/database/migrations/migration",
+    "migration:run": "typeorm-ts-node-commonjs -d ./src/database/data-source.ts migration:run",
     "migration:revert": "typeorm-ts-node-commonjs -d ./src/database/data-source.ts migration:revert"
   },
   "dependencies": {
@@ -52,14 +52,14 @@
     "joi": "^17.11.0",
     "lodash": "^4.17.21",
     "mongoose": "^8.0.3",
+    "mysql2": "^3.9.7",
     "onesignal-node": "^3.4.0",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
-    "pg": "^8.11.3",
     "redis": "^4.6.12",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.17",
+    "typeorm": "^0.3.20",
     "uuid": "^9.0.1",
     "winston": "^3.11.0"
   },
@@ -87,7 +87,7 @@
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.3",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.1.3"
   },

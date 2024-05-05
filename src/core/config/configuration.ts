@@ -31,12 +31,12 @@ export default (): any => ({
     REDIS_PORT: process.env.REDIS_PORT,
     REDIS_URL: process.env.REDIS_URL,
   },
-  PG: {
-    PG_USERNAME: process.env.PG_USERNAME,
-    PG_PASSWORD: process.env.PG_PASSWORD,
-    PG_DATABASE_NAME: process.env.PG_DATABASE_NAME,
-    PG_PORT: process.env.PG_PORT,
-    PG_HOST: process.env.PG_HOST,
+  MYSQL: {
+    MYSQL_USERNAME: process.env.MYSQL_USERNAME,
+    MYSQL_PASSWORD: process.env.MYSQL_PASSWORD,
+    MYSQL_DATABASE: process.env.MYSQL_DATABASE,
+    MYSQL_PORT: process.env.MYSQL_PORT,
+    MYSQL_HOST: process.env.MYSQL_HOST,
   },
   ONESIGNAL: {
     ONESIGNAL_APP_ID: process.env.ONESIGNAL_APP_ID,
@@ -49,5 +49,9 @@ export default (): any => ({
     JWT_ACCESS_TOKEN_EXPIRES_IN: process.env.JWT_ACCESS_TOKEN_EXPIRES_IN,
     JWT_REFRESH_TOKEN_EXPIRES_IN: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN,
     JWT_REGISTER_TOKEN_EXPIRES_IN: process.env.JWT_REGISTER_TOKEN_EXPIRES_IN,
+  },
+  THROTTLE: {
+    THROTTLE_LIMIT: process.env.THROTTLE_LIMIT,
+    THROTTLE_TTL: process.env.THROTTLE_TTL,
   },
 });

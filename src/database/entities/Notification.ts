@@ -4,7 +4,7 @@ import { BaseModel } from './BaseModel';
 
 @Entity('notification')
 export class Notification extends BaseModel {
-  @Column({ name: 'type', type: 'smallint', nullable: true })
+  @Column({ name: 'type', type: 'tinyint', nullable: true })
   type?: number;
 
   @Column({ name: 'title', type: 'varchar', length: '500', nullable: true })
@@ -23,11 +23,11 @@ export class Notification extends BaseModel {
   redirect_id: number;
 
   @Index()
-  @Column({ name: 'redirect_type', type: 'smallint', nullable: true })
+  @Column({ name: 'redirect_type', type: 'tinyint', nullable: true })
   redirectType?: number;
 
   @Index()
-  @Column({ name: 'target_type', type: 'smallint', default: 1 })
+  @Column({ name: 'target_type', type: 'tinyint', default: 1 })
   targetType: NotificationTargetType;
 
   @Column({ name: 'uuid', type: 'uuid', nullable: true })

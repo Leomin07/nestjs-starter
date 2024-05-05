@@ -32,7 +32,7 @@ export class NotificationMember {
   @Index()
   @Column({
     name: 'is_read',
-    type: 'smallint',
+    type: 'tinyint',
     default: ReadNotification.UNREAD,
   })
   isRead: ReadNotification;
@@ -40,7 +40,7 @@ export class NotificationMember {
   @Index()
   @Column({
     name: 'status',
-    type: 'smallint',
+    type: 'tinyint',
     default: CommonStatus.ACTIVE,
   })
   status: number;

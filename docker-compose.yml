@@ -16,14 +16,6 @@ services:
   #   ports:
   #     - '3306:3306'
 
-  postgres:
-    image: postgres:alpine
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: 123
-    ports:
-      - '5432:5432'
-
   redis:
     image: redis:alpine
     container_name: redis
@@ -34,29 +26,3 @@ services:
       - '6379:6379'
     expose:
       - 6379
-    volumes:
-      - redis_volume_data:/data
-
-  redis_commander:
-    image: rediscommander/redis-commander:latest
-    container_name: redis_commander
-    restart: always
-    environment:
-      - REDIS_HOSTS=local:redis:6379
-    ports:
-      - '8088:8081'
-    depends_on:
-      - redis
-
-  # redis_insight:
-  #   image: redislabs/redisinsight:latest
-  #   container_name: redis_insight
-  #   restart: always
-  #   ports:
-  #     - '8001:8001'
-  #   volumes:
-  #     - redis_insight_volume_data:/db
-
-volumes:
-  redis_volume_data:
-  # redis_insight_volume_data:
