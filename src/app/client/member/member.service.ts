@@ -5,20 +5,21 @@ import { Exception } from 'src/core/exceptions/base-api.exception';
 import { Member } from 'src/database/entities/Member';
 import { VerificationCode } from 'src/database/entities/VerificationCode';
 import {
+  VerificationCodeType,
+  VerificationCodeStatus,
   ErrorMessage,
   UserType,
-  VerificationCodeStatus,
-  VerificationCodeType,
+  ErrorCode,
 } from 'src/helpers/enum';
-import { randomOTP, randomString } from 'src/helpers/utils';
+import { randomString, randomOTP } from 'src/helpers/utils';
 import { JwtAuthenticationService } from 'src/libs/jwt-authentication/jwt-authentication.service';
-import { DataSource, MoreThan, Repository } from 'typeorm';
+import { Repository, DataSource, MoreThan } from 'typeorm';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { RequestVerificationCodeDto } from './dto/request-verification-code.dto';
 
 @Injectable()
-export class AuthService {
+export class MemberService {
   constructor(
     @InjectRepository(Member)
     private readonly memberRepository: Repository<Member>,
@@ -61,7 +62,10 @@ export class AuthService {
     });
 
     if (!codeObject) {
-      throw new Exception(ErrorMessage.Verification_Code_Invalid);
+      throw new Exception(
+        ErrorCode.Verification_Code_Invalid,
+        ErrorMessage.Verification_Code_Invalid,
+      );
     }
 
     return codeObject;
@@ -72,6 +76,7 @@ export class AuthService {
   ) {
     if (!params.changePhoneCode) {
       throw new Exception(
+        ErrorCode.Invalid_Input,
         ErrorMessage.Invalid_Input,
         'Missing changePhoneCode',
       );
@@ -83,11 +88,15 @@ export class AuthService {
     });
 
     if (!member) {
-      throw new Exception(ErrorMessage.Change_Phone_Number_Code_Invalid);
+      throw new Exception(
+        ErrorCode.Change_Phone_Number_Code_Invalid,
+        ErrorMessage.Change_Phone_Number_Code_Invalid,
+      );
     }
 
     if (member.phone === params.phone) {
       throw new Exception(
+        ErrorCode.Your_Are_Change_To_Shame_Phone_Number,
         ErrorMessage.Your_Are_Change_To_Shame_Phone_Number,
         'Old phone number and new phone number are same',
       );
@@ -99,7 +108,10 @@ export class AuthService {
     });
 
     if (hasPhone) {
-      throw new Exception(ErrorMessage.Phone_Already_Exists);
+      throw new Exception(
+        ErrorCode.Phone_Already_Exists,
+        ErrorMessage.Phone_Already_Exists,
+      );
     }
   }
 
@@ -118,7 +130,10 @@ export class AuthService {
         select: ['id', 'status'],
       });
       if (!member) {
-        throw new Exception(ErrorMessage.Phone_Not_Exists);
+        throw new Exception(
+          ErrorCode.Phone_Already_Exists,
+          ErrorMessage.Phone_Not_Exists,
+        );
       }
     }
 
@@ -130,6 +145,7 @@ export class AuthService {
 
       if (member) {
         throw new Exception(
+          ErrorCode.Phone_Already_Exists,
           ErrorMessage.Phone_Already_Exists,
           'This phone number already exists',
         );
@@ -148,6 +164,7 @@ export class AuthService {
     if (codeObject) {
       if (codeObject.retryCount >= 5) {
         throw new Exception(
+          ErrorCode.Maximum_Retry_Verification_Code,
           ErrorMessage.Maximum_Retry_Verification_Code,
           `Block until: ${codeObject.expireRetry}(15 minutes from the first call)`,
         );
@@ -161,6 +178,7 @@ export class AuthService {
           currentMs
         ) {
           throw new Exception(
+            ErrorCode.Delay_Between_Retry_Required,
             ErrorMessage.Delay_Between_Retry_Required,
             `Delay between retry is ${
               this.configService.get('DELAY_BETWEEN_RETRY') / 1000
@@ -214,7 +232,10 @@ export class AuthService {
     });
 
     if (!codeObject) {
-      throw new Exception(ErrorMessage.Verification_Code_Invalid);
+      throw new Exception(
+        ErrorCode.Verification_Code_Invalid,
+        ErrorMessage.Verification_Code_Invalid,
+      );
     }
 
     await this.verificationCodeRepository.update(
@@ -269,7 +290,10 @@ export class AuthService {
         select: ['id', 'phone', 'status', 'refreshToken'],
       });
       if (!member) {
-        throw new Exception(ErrorMessage.Phone_Not_Exists);
+        throw new Exception(
+          ErrorCode.Phone_Not_Exists,
+          ErrorMessage.Phone_Not_Exists,
+        );
       }
 
       const codeObject = await this.checkVerificationCode(
@@ -295,11 +319,17 @@ export class AuthService {
       const payload =
         this.jwtAuthenticationService.verifyRegisterToken(registerToken);
       if (!payload) {
-        throw new Exception(ErrorMessage.Register_Token_Expired);
+        throw new Exception(
+          ErrorCode.Register_Token_Expired,
+          ErrorMessage.Register_Token_Expired,
+        );
       }
 
       if (payload.phone !== params.phone) {
-        throw new Exception(ErrorMessage.Register_Token_Expired);
+        throw new Exception(
+          ErrorCode.Register_Token_Expired,
+          ErrorMessage.Register_Token_Expired,
+        );
       }
 
       const member = await memberRepository.findOne({
@@ -308,7 +338,10 @@ export class AuthService {
       });
 
       if (member?.phone === params.phone) {
-        throw new Exception(ErrorMessage.Phone_Already_Exists);
+        throw new Exception(
+          ErrorCode.Phone_Already_Exists,
+          ErrorMessage.Phone_Already_Exists,
+        );
       }
 
       const newMember = await memberRepository.save(params);

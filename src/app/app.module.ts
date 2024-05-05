@@ -10,16 +10,11 @@ import { AllExceptionsFilter } from 'src/core/filters/all-exceptions.filter';
 import { LoggingInterceptor } from 'src/core/interceptors/logging.interceptor';
 import { TransformResponseInterceptor } from 'src/core/interceptors/transform-res.interceptor';
 import { AppLogger } from 'src/core/logger/logger.service';
-import { LoggerMiddleware } from 'src/core/middleware/logger.middlware';
-import { Member } from 'src/database/entities/Member';
-import { Notification } from 'src/database/entities/Notification';
-import { NotificationMember } from 'src/database/entities/NotificationMember';
-import { VerificationCode } from 'src/database/entities/VerificationCode';
+import { LoggerMiddleware } from 'src/core/middleware/logger.middleware';
 import { Environment } from 'src/helpers/enum';
+import { AuthGuard } from 'src/libs/jwt-authentication/auth.guard';
 import { JwtAuthenticationModule } from 'src/libs/jwt-authentication/jwt-authentication.module';
-import { GlobalCacheModule } from '../libs/cache/cache.module';
-import { AuthModule } from './auth/auth.module';
-
+import { ClientModule } from './client/client.module';
 @Module({
   imports: [
     ConfigModule.forRoot(configModuleOptions),
@@ -30,12 +25,16 @@ import { AuthModule } from './auth/auth.module';
     /* -------------------------------------------------------------------------- */
     /*                               ThrottlerModule                              */
     /* -------------------------------------------------------------------------- */
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 10,
-      },
-    ]),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => [
+        {
+          ttl: configService.get('THROTTLE_TTL'),
+          limit: configService.get('THROTTLE_LIMIT'),
+        },
+      ],
+    }),
     /* -------------------------------------------------------------------------- */
     /*                                Bullmq module                               */
     /* -------------------------------------------------------------------------- */
@@ -54,20 +53,29 @@ import { AuthModule } from './auth/auth.module';
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('PG_HOST'),
-        port: configService.get('PG_PORT'),
-        username: configService.get('PG_USERNAME'),
-        password: configService.get('PG_PASSWORD'),
-        database: configService.get('PG_DATABASE_NAME'),
-        entities: [Notification, NotificationMember, Member, VerificationCode],
+        type: 'mysql',
+        host: configService.get('MYSQL_HOST'),
+        port: configService.get('MYSQL_PORT'),
+        username: configService.get('MYSQL_USERNAME'),
+        password: configService.get('MYSQL_PASSWORD'),
+        database: configService.get('MYSQL_DATABASE'),
+        autoLoadEntities: true,
         synchronize: false,
         logging: configService.get('NODE_ENV') !== Environment.Production,
       }),
     }),
-    GlobalCacheModule,
+    /* -------------------------------------------------------------------------- */
+    /*                                  Mongoose                                  */
+    /* -------------------------------------------------------------------------- */
+    // MongooseModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: async (configService: ConfigService) => ({
+    //     uri: configService.get('MONGODB_URI'),
+    //   }),
+    // }),
+    ClientModule,
     JwtAuthenticationModule,
-    AuthModule,
   ],
   /* -------------------------------------------------------------------------- */
   /*                                  Providers                                 */
@@ -77,10 +85,10 @@ import { AuthModule } from './auth/auth.module';
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: AuthGuard,
-    // },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,

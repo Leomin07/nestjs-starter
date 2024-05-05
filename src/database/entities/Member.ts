@@ -1,5 +1,6 @@
 import { Column, Entity } from 'typeorm';
 import { BaseModel } from './BaseModel';
+import { PlainLiteralObject } from '@nestjs/common';
 
 @Entity('member')
 export class Member extends BaseModel {
@@ -52,7 +53,7 @@ export class Member extends BaseModel {
 
   @Column({
     name: 'is_super_admin',
-    type: 'smallint',
+    type: 'tinyint',
     default: 0,
     nullable: true,
     comment: '1: Active, 0:A Active',
@@ -61,7 +62,7 @@ export class Member extends BaseModel {
 
   @Column({
     name: 'role_id',
-    type: 'smallint',
+    type: 'tinyint',
     comment: 'Role for admin',
     nullable: true,
   })
@@ -74,4 +75,10 @@ export class Member extends BaseModel {
     select: false,
   })
   password?: string;
+
+  @Column({
+    type: 'json',
+    nullable: true,
+  })
+  payload?: PlainLiteralObject;
 }

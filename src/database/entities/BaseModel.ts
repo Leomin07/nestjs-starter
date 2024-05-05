@@ -16,7 +16,7 @@ export class BaseModel {
 
   @Index()
   @Column({
-    type: 'smallint',
+    type: 'tinyint',
     default: CommonStatus.ACTIVE,
     nullable: false,
     comment: '0:Inactive, 1: Active, 2:Pending',

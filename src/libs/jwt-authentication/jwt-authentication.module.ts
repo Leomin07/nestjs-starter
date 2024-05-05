@@ -6,6 +6,6 @@ import { JwtAuthenticationService } from './jwt-authentication.service';
 @Module({
   imports: [JwtModule.register({}), PassportModule],
   providers: [JwtAuthenticationService],
-  exports: [JwtAuthenticationService, JwtAuthenticationModule],
+  exports: [JwtAuthenticationService],
 })
 export class JwtAuthenticationModule {}

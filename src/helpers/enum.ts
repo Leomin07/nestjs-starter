@@ -15,6 +15,27 @@ export enum ReadNotification {
   READ = 1,
 }
 
+export enum ErrorCode {
+  Unknown_Error = 'Unknown_Error',
+  Invalid_Input = 'Invalid_Input',
+  Not_Found = 'Not_Found',
+  Token_Not_Exist = 'Token_Not_Exist',
+  Forbidden_Resource = 'Forbidden_Resource',
+  Unauthorized = 'Unauthorized',
+  Too_Many_Requests = 'Too_Many_Requests',
+  Permission_Denied = 'Permission_Denied',
+  Register_Token_Expired = 'Register_Token_Expired',
+  Phone_Already_Exists = 'Phone_Already_Exists',
+  Code_Already_Exists = 'Code_Already_Exists',
+  Change_Phone_Number_Code_Invalid = 'Change_Phone_Number_Code_Invalid',
+  Your_Are_Change_To_Shame_Phone_Number = 'Your_Are_Change_To_Shame_Phone_Number',
+  Phone_Not_Exists = 'Phone_Not_Exists',
+  Maximum_Retry_Verification_Code = 'Maximum_Retry_Verification_Code',
+  Delay_Between_Retry_Required = 'Delay_Between_Retry_Required',
+  Verification_Code_Invalid = 'Verification_Code_Invalid',
+  The_Allowed_Number_Of_Calls_Has_Been_Exceeded = 'The_Allowed_Number_Of_Calls_Has_Been_Exceeded',
+}
+
 export enum ErrorMessage {
   Unknown_Error = 'Unknown_Error',
   Invalid_Input = 'Invalid_Input',
@@ -33,6 +54,7 @@ export enum ErrorMessage {
   Maximum_Retry_Verification_Code = 'Maximum_Retry_Verification_Code',
   Delay_Between_Retry_Required = 'Delay_Between_Retry_Required',
   Verification_Code_Invalid = 'Verification_Code_Invalid',
+  The_Allowed_Number_Of_Calls_Has_Been_Exceeded = 'The_Allowed_Number_Of_Calls_Has_Been_Exceeded',
 }
 
 export enum UserType {

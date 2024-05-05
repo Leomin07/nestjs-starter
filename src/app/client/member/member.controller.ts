@@ -7,27 +7,27 @@ import {
 } from 'src/core/decorator/swagger.decorator';
 import { ClientGuard } from 'src/core/guards/client.guard';
 import { Public } from 'src/libs/jwt-authentication/jwt-authentication.decorator';
-import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { RequestVerificationCodeDto } from './dto/request-verification-code.dto';
+import { MemberService } from './member.service';
 
 const configService = new ConfigService();
 @CustomController('auth')
 @UseGuards(ClientGuard)
-export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+export class MemberController {
+  constructor(private readonly memberService: MemberService) {}
 
   @Public()
   @CustomPost('/login', LoginDto)
   async login(@Body() body: LoginDto) {
-    return await this.authService.login(body);
+    return await this.memberService.login(body);
   }
 
   @Public()
   @CustomPost('/register', RegisterDto)
   async register(@Body() body: RegisterDto) {
-    return await this.authService.register(body);
+    return await this.memberService.register(body);
   }
 
   @Public()
@@ -39,13 +39,13 @@ export class AuthController {
   })
   @CustomPost('/request-verification-code', RequestVerificationCodeDto)
   async requestVerificationCode(@Body() body: RequestVerificationCodeDto) {
-    return await this.authService.requestVerifyCationCode(body);
+    return await this.memberService.requestVerifyCationCode(body);
   }
 
   @Public()
   @Get('/register-token/:code')
   async fetchRegisterToken(@Param('code') code: string) {
-    return this.authService.fetchRegisterCode(code);
+    return this.memberService.fetchRegisterCode(code);
   }
 
   @Public()
@@ -54,7 +54,7 @@ export class AuthController {
     @Body('refreshToken')
     refreshToken: string,
   ): Promise<{ token: string }> {
-    const token = await this.authService.refreshToken(refreshToken);
+    const token = await this.memberService.refreshToken(refreshToken);
     return { token };
   }
 }

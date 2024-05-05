@@ -1,17 +1,18 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { ErrorMessage } from 'src/helpers/enum';
+import { ErrorCode, ErrorMessage } from 'src/helpers/enum';
 
 export class BaseApiException extends HttpException {
   public details: string | Record<string, any>;
 
   constructor(
-    message: ErrorMessage,
+    errorCode: ErrorCode,
+    errorMessage: ErrorMessage,
     devMessage?: string | any,
     status?: HttpStatus,
     details?: string | Record<string, any>,
   ) {
     // Calling parent constructor of base Exception class.
-    const objError = { message, devMessage };
+    const objError = { errorCode, errorMessage, devMessage };
     if (devMessage) objError['devMessage'] = devMessage;
 
     super(objError, status);
@@ -35,12 +36,13 @@ export class Exception extends BaseApiException {
    *   throw Exception("Unknown_Error", "This is error description", HttpStatus.BAD_REQUEST, { isSystem: true })
    */
   constructor(
-    message: ErrorMessage,
+    errorCode: ErrorCode,
+    errorMessage: ErrorMessage,
     devMessage?: string | any,
     status?: HttpStatus,
     details?: string | Record<string, any>,
   ) {
-    super(message, devMessage, status);
+    super(errorCode, errorMessage, devMessage, status);
     this.name = BaseApiException.name;
     this.details = details;
   }
