@@ -1,3 +1,4 @@
+import { MongooseModule } from '@nestjs/mongoose';
 import { BullModule } from '@nestjs/bullmq';
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -12,10 +13,7 @@ import { TransformResponseInterceptor } from 'src/core/interceptors/transform-re
 import { AppLogger } from 'src/core/logger/logger.service';
 import { LoggerMiddleware } from 'src/core/middleware/logger.middlware';
 import { Environment } from 'src/helpers/enum';
-import { JwtAuthenticationModule } from 'src/libs/jwt-authentication/jwt-authentication.module';
-import { GlobalCacheModule } from '../libs/cache/cache.module';
-import { AuthModule } from './auth/auth.module';
-
+import { ClientModule } from './client/client.module';
 @Module({
   imports: [
     ConfigModule.forRoot(configModuleOptions),
@@ -65,9 +63,17 @@ import { AuthModule } from './auth/auth.module';
         logging: configService.get('NODE_ENV') !== Environment.Production,
       }),
     }),
-    JwtAuthenticationModule,
-    AuthModule,
-    GlobalCacheModule,
+    /* -------------------------------------------------------------------------- */
+    /*                                  Mongoose                                  */
+    /* -------------------------------------------------------------------------- */
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get('MONGODB_URI'),
+      }),
+    }),
+    ClientModule,
   ],
   /* -------------------------------------------------------------------------- */
   /*                                  Providers                                 */

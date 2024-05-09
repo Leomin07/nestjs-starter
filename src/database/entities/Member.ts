@@ -1,5 +1,6 @@
 import { Column, Entity } from 'typeorm';
 import { BaseModel } from './BaseModel';
+import { PlainLiteralObject } from '@nestjs/common';
 
 @Entity('member')
 export class Member extends BaseModel {
@@ -74,4 +75,10 @@ export class Member extends BaseModel {
     select: false,
   })
   password?: string;
+
+  @Column({
+    type: 'json',
+    nullable: true,
+  })
+  payload?: PlainLiteralObject;
 }

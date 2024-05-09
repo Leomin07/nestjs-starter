@@ -54,4 +54,7 @@ export default (): any => ({
     THROTTLE_LIMIT: process.env.THROTTLE_LIMIT,
     THROTTLE_TTL: process.env.THROTTLE_TTL,
   },
+  MONGOOSE: {
+    MONGODB_URI: process.env.MONGODB_URI,
+  },
 });

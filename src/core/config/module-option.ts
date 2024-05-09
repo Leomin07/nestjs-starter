@@ -40,6 +40,7 @@ export const configModuleOptions: ConfigModuleOptions = {
     CONFIG_RETRY_BLOCK: Joi.number().required(),
     THROTTLE_LIMIT: Joi.number().required(),
     THROTTLE_TTL: Joi.number().required(),
+    MONGODB_URI: Joi.string().required(),
   }),
   load: [configuration],
   validationOptions: {
