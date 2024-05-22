@@ -41,6 +41,7 @@ export const configModuleOptions: ConfigModuleOptions = {
     THROTTLE_LIMIT: Joi.number().required(),
     THROTTLE_TTL: Joi.number().required(),
     MONGODB_URI: Joi.string().required(),
+    MONGODB_NAME: Joi.string().required(),
   }),
   load: [configuration],
   validationOptions: {

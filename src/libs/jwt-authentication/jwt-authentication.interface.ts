@@ -1,7 +1,8 @@
+import { MongoId } from 'src/helpers/common.type';
 import { TokenType, UserType } from 'src/helpers/enum';
 
 export interface ITokenPayload {
-  id: number;
+  _id: MongoId;
   userType: UserType;
   tokenType?: TokenType;
   [key: string]: any;

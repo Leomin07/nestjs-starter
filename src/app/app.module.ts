@@ -5,7 +5,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { configModuleOptions } from 'src/core/config/module-option';
 import { AllExceptionsFilter } from 'src/core/filters/all-exceptions.filter';
 import { LoggingInterceptor } from 'src/core/interceptors/logging.interceptor';
@@ -47,23 +46,6 @@ import { ClientModule } from './client/client.module';
       }),
     }),
     /* -------------------------------------------------------------------------- */
-    /*                                   Typeorm                                   */
-    /* -------------------------------------------------------------------------- */
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get('MYSQL_HOST'),
-        port: configService.get('MYSQL_PORT'),
-        username: configService.get('MYSQL_USERNAME'),
-        password: configService.get('MYSQL_PASSWORD'),
-        database: configService.get('MYSQL_DATABASE'),
-        autoLoadEntities: true,
-        synchronize: false,
-        logging: configService.get('NODE_ENV') !== Environment.Production,
-      }),
-    }),
-    /* -------------------------------------------------------------------------- */
     /*                                  Mongoose                                  */
     /* -------------------------------------------------------------------------- */
     MongooseModule.forRootAsync({
@@ -71,6 +53,7 @@ import { ClientModule } from './client/client.module';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get('MONGODB_URI'),
+        dbName: configService.get('MONGODB_NAME'),
       }),
     }),
     ClientModule,

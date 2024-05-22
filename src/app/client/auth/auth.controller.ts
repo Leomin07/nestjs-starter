@@ -18,11 +18,11 @@ const configService = new ConfigService();
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Public()
-  @CustomPost('/login', LoginDto)
-  async login(@Body() body: LoginDto) {
-    return await this.authService.login(body);
-  }
+  // @Public()
+  // @CustomPost('/login', LoginDto)
+  // async login(@Body() body: LoginDto) {
+  //   return await this.authService.login(body);
+  // }
 
   @Public()
   @CustomPost('/register', RegisterDto)
@@ -30,31 +30,31 @@ export class AuthController {
     return await this.authService.register(body);
   }
 
-  @Public()
-  @Throttle({
-    default: {
-      limit: configService.get('REQUEST_VERIFICATION_CODE_LIMIT'),
-      ttl: configService.get('REQUEST_VERIFICATION_CODE_TTL'),
-    },
-  })
-  @CustomPost('/request-verification-code', RequestVerificationCodeDto)
-  async requestVerificationCode(@Body() body: RequestVerificationCodeDto) {
-    return await this.authService.requestVerifyCationCode(body);
-  }
+  // @Public()
+  // @Throttle({
+  //   default: {
+  //     limit: configService.get('REQUEST_VERIFICATION_CODE_LIMIT'),
+  //     ttl: configService.get('REQUEST_VERIFICATION_CODE_TTL'),
+  //   },
+  // })
+  // @CustomPost('/request-verification-code', RequestVerificationCodeDto)
+  // async requestVerificationCode(@Body() body: RequestVerificationCodeDto) {
+  //   return await this.authService.requestVerifyCationCode(body);
+  // }
 
-  @Public()
-  @Get('/register-token/:code')
-  async fetchRegisterToken(@Param('code') code: string) {
-    return this.authService.fetchRegisterCode(code);
-  }
+  // @Public()
+  // @Get('/register-token/:code')
+  // async fetchRegisterToken(@Param('code') code: string) {
+  //   return this.authService.fetchRegisterCode(code);
+  // }
 
-  @Public()
-  @Post('refresh-token')
-  async refreshToken(
-    @Body('refreshToken')
-    refreshToken: string,
-  ): Promise<{ token: string }> {
-    const token = await this.authService.refreshToken(refreshToken);
-    return { token };
-  }
+  // @Public()
+  // @Post('refresh-token')
+  // async refreshToken(
+  //   @Body('refreshToken')
+  //   refreshToken: string,
+  // ): Promise<{ token: string }> {
+  //   const token = await this.authService.refreshToken(refreshToken);
+  //   return { token };
+  // }
 }

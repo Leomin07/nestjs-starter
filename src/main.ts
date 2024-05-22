@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import { AppModule } from './app/app.module';
 import { VALIDATION_PIPE_OPTIONS } from './core/constants';
 import { RequestIdMiddleware } from './core/middleware/request-id.middleware';
+import * as mongoose from 'mongoose';
 
 async function bootstrap() {
   const logger = new Logger();
@@ -13,8 +14,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
+  /**
+   * ConfigService
+   */
   const configService = app.get(ConfigService);
 
+  /**
+   * Add prefix route
+   */
   app.setGlobalPrefix(configService.get('API_V1_STR'));
 
   app.useGlobalPipes(new ValidationPipe(VALIDATION_PIPE_OPTIONS));
@@ -22,7 +29,9 @@ async function bootstrap() {
   app.enableCors();
   app.use(helmet());
 
-  /** Swagger configuration*/
+  /**
+   * Swagger configuration
+   */
   const options = new DocumentBuilder()
     .setTitle(configService.get('APP_NAME'))
     .setDescription(configService.get('DESCRIPTION_APP'))
@@ -35,6 +44,14 @@ async function bootstrap() {
 
   const port = configService.get<number>('APP_PORT');
   await app.listen(port);
+
+  /**
+   * Mongoose config logging query
+   */
+  const env = configService.get('NODE_ENV');
+  if (env === 'development') {
+    mongoose.set('debug', true);
+  }
 
   logger.log(`App running on ${port}`);
 }

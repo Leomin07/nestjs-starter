@@ -4,6 +4,6 @@ import { JwtAuthenticationModule } from 'src/libs/jwt-authentication/jwt-authent
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [JwtAuthenticationModule, AuthModule, GlobalCacheModule],
+  // imports: [JwtAuthenticationModule, AuthModule, GlobalCacheModule],
 })
 export class ClientModule {}

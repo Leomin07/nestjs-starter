@@ -1,43 +1,41 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import mongoose, { Connection, Model } from 'mongoose';
+import { JwtAuthenticationService } from 'src/libs/jwt-authentication/jwt-authentication.service';
+import { Member } from 'src/schemas/MemberSchema';
+import { VerificationCode } from 'src/schemas/VerificationCode';
+import { RegisterDto } from './dto/register.dto';
 import { Exception } from 'src/core/exceptions/base-api.exception';
-import { Member } from 'src/database/entities/Member';
-import { VerificationCode } from 'src/database/entities/VerificationCode';
 import {
   ErrorMessage,
   UserType,
   VerificationCodeStatus,
-  VerificationCodeType,
 } from 'src/helpers/enum';
-import { randomOTP, randomString } from 'src/helpers/utils';
-import { JwtAuthenticationService } from 'src/libs/jwt-authentication/jwt-authentication.service';
-import { DataSource, MoreThan, Repository } from 'typeorm';
 import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
-import { RequestVerificationCodeDto } from './dto/request-verification-code.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(Member)
-    private readonly memberRepository: Repository<Member>,
-    @InjectRepository(VerificationCode)
-    private readonly verificationCodeRepository: Repository<VerificationCode>,
-    private readonly dataSource: DataSource,
+    @InjectModel(Member.name)
+    private readonly memberModel: Model<Member>,
+    @InjectModel(VerificationCode.name)
+    private readonly verificationCodeModel: Model<VerificationCode>,
     private readonly jwtAuthenticationService: JwtAuthenticationService,
     private readonly configService: ConfigService,
+    @InjectConnection()
+    private readonly connection: Connection,
   ) {}
 
-  async createChangePhoneCode(memberRepository: Repository<Member>) {
+  async createChangePhoneCode(memberModel: Repository<Member>) {
     const changePhoneCode = randomString(10);
-    const member = await memberRepository.findOne({
+    const member = await memberModel.findOne({
       where: { changePhoneCode },
-      select: ['id'],
+      select: ['_id'],
     });
 
     if (member) {
-      return await this.createChangePhoneCode(memberRepository);
+      return await this.createChangePhoneCode(memberModel);
     }
 
     return changePhoneCode;
@@ -67,177 +65,177 @@ export class AuthService {
     return codeObject;
   }
 
-  async handleRequestVerificationCodeForChangePhone(
-    params: RequestVerificationCodeDto,
-  ) {
-    if (!params.changePhoneCode) {
-      throw new Exception(
-        ErrorMessage.Invalid_Input,
-        'Missing changePhoneCode',
-      );
-    }
+  // async handleRequestVerificationCodeForChangePhone(
+  //   params: RequestVerificationCodeDto,
+  // ) {
+  //   if (!params.changePhoneCode) {
+  //     throw new Exception(
+  //       ErrorMessage.Invalid_Input,
+  //       'Missing changePhoneCode',
+  //     );
+  //   }
 
-    const member = await this.memberRepository.findOne({
-      where: { changePhoneCode: params.changePhoneCode },
-      select: ['id', 'phone', 'status'],
-    });
+  //   const member = await this.memberModel.findOne({
+  //     where: { changePhoneCode: params.changePhoneCode },
+  //     select: ['id', 'phone', 'status'],
+  //   });
 
-    if (!member) {
-      throw new Exception(ErrorMessage.Change_Phone_Number_Code_Invalid);
-    }
+  //   if (!member) {
+  //     throw new Exception(ErrorMessage.Change_Phone_Number_Code_Invalid);
+  //   }
 
-    if (member.phone === params.phone) {
-      throw new Exception(
-        ErrorMessage.Your_Are_Change_To_Shame_Phone_Number,
-        'Old phone number and new phone number are same',
-      );
-    }
+  //   if (member.phone === params.phone) {
+  //     throw new Exception(
+  //       ErrorMessage.Your_Are_Change_To_Shame_Phone_Number,
+  //       'Old phone number and new phone number are same',
+  //     );
+  //   }
 
-    const hasPhone = await this.memberRepository.findOne({
-      where: { phone: params.phone },
-      select: ['id'],
-    });
+  //   const hasPhone = await this.memberModel.findOne({
+  //     where: { phone: params.phone },
+  //     select: ['id'],
+  //   });
 
-    if (hasPhone) {
-      throw new Exception(ErrorMessage.Phone_Already_Exists);
-    }
-  }
+  //   if (hasPhone) {
+  //     throw new Exception(ErrorMessage.Phone_Already_Exists);
+  //   }
+  // }
 
-  async requestVerifyCationCode(params: RequestVerificationCodeDto) {
-    const { phone, type } = params;
-    const code = randomOTP();
-    const currentMs = new Date().getTime();
+  // async requestVerifyCationCode(params: RequestVerificationCodeDto) {
+  //   const { phone, type } = params;
+  //   const code = randomOTP();
+  //   const currentMs = new Date().getTime();
 
-    if (params.type === VerificationCodeType.CHANGE_PHONE_NUMBER) {
-      await this.handleRequestVerificationCodeForChangePhone(params);
-    }
+  //   if (params.type === VerificationCodeType.CHANGE_PHONE_NUMBER) {
+  //     await this.handleRequestVerificationCodeForChangePhone(params);
+  //   }
 
-    if (params.type === VerificationCodeType.LOGIN) {
-      const member = await this.memberRepository.findOne({
-        where: { phone: params.phone },
-        select: ['id', 'status'],
-      });
-      if (!member) {
-        throw new Exception(ErrorMessage.Phone_Not_Exists);
-      }
-    }
+  //   if (params.type === VerificationCodeType.LOGIN) {
+  //     const member = await this.memberModel.findOne({
+  //       where: { phone: params.phone },
+  //       select: ['id', 'status'],
+  //     });
+  //     if (!member) {
+  //       throw new Exception(ErrorMessage.Phone_Not_Exists);
+  //     }
+  //   }
 
-    if (params.type === VerificationCodeType.REGISTER) {
-      const member = await this.memberRepository.findOne({
-        where: { phone: params.phone },
-        select: ['id', 'status'],
-      });
+  //   if (params.type === VerificationCodeType.REGISTER) {
+  //     const member = await this.memberModel.findOne({
+  //       where: { phone: params.phone },
+  //       select: ['id', 'status'],
+  //     });
 
-      if (member) {
-        throw new Exception(
-          ErrorMessage.Phone_Already_Exists,
-          'This phone number already exists',
-        );
-      }
-    }
+  //     if (member) {
+  //       throw new Exception(
+  //         ErrorMessage.Phone_Already_Exists,
+  //         'This phone number already exists',
+  //       );
+  //     }
+  //   }
 
-    const codeObject = await this.verificationCodeRepository.findOne({
-      where: {
-        phone,
-        type,
-        status: VerificationCodeStatus.ACTIVE,
-        expireRetry: MoreThan(new Date(currentMs).toISOString()),
-      },
-    });
+  //   const codeObject = await this.verificationCodeModel.findOne({
+  //     where: {
+  //       phone,
+  //       type,
+  //       status: VerificationCodeStatus.ACTIVE,
+  //       expireRetry: MoreThan(new Date(currentMs).toISOString()),
+  //     },
+  //   });
 
-    if (codeObject) {
-      if (codeObject.retryCount >= 5) {
-        throw new Exception(
-          ErrorMessage.Maximum_Retry_Verification_Code,
-          `Block until: ${codeObject.expireRetry}(15 minutes from the first call)`,
-        );
-      }
+  //   if (codeObject) {
+  //     if (codeObject.retryCount >= 5) {
+  //       throw new Exception(
+  //         ErrorMessage.Maximum_Retry_Verification_Code,
+  //         `Block until: ${codeObject.expireRetry}(15 minutes from the first call)`,
+  //       );
+  //     }
 
-      if (codeObject.expireAt) {
-        const retryAtMs = new Date(codeObject.retryAt).getTime();
+  //     if (codeObject.expireAt) {
+  //       const retryAtMs = new Date(codeObject.retryAt).getTime();
 
-        if (
-          retryAtMs + this.configService.get('DELAY_BETWEEN_RETRY') >
-          currentMs
-        ) {
-          throw new Exception(
-            ErrorMessage.Delay_Between_Retry_Required,
-            `Delay between retry is ${
-              this.configService.get('DELAY_BETWEEN_RETRY') / 1000
-            } s, next time available from ${new Date(
-              retryAtMs + this.configService.get('DELAY_BETWEEN_RETRY'),
-            ).toISOString()}`,
-          );
-        }
-      }
+  //       if (
+  //         retryAtMs + this.configService.get('DELAY_BETWEEN_RETRY') >
+  //         currentMs
+  //       ) {
+  //         throw new Exception(
+  //           ErrorMessage.Delay_Between_Retry_Required,
+  //           `Delay between retry is ${
+  //             this.configService.get('DELAY_BETWEEN_RETRY') / 1000
+  //           } s, next time available from ${new Date(
+  //             retryAtMs + this.configService.get('DELAY_BETWEEN_RETRY'),
+  //           ).toISOString()}`,
+  //         );
+  //       }
+  //     }
 
-      await this.verificationCodeRepository.update(
-        { id: codeObject.id },
-        {
-          retryCount: codeObject.retryCount + 1,
-          code,
-          retryAt: new Date(currentMs).toISOString(),
-        },
-      );
-    }
+  //     await this.verificationCodeModel.update(
+  //       { id: codeObject.id },
+  //       {
+  //         retryCount: codeObject.retryCount + 1,
+  //         code,
+  //         retryAt: new Date(currentMs).toISOString(),
+  //       },
+  //     );
+  //   }
 
-    const expireAt = new Date(
-      currentMs + this.configService.get('VERIFY_CODE_TTL'),
-    ).toISOString();
-    const expireRetry = new Date(
-      currentMs + this.configService.get('CONFIG_RETRY_BLOCK'),
-    ).toISOString();
-    const useAt = new Date(currentMs).toISOString();
+  //   const expireAt = new Date(
+  //     currentMs + this.configService.get('VERIFY_CODE_TTL'),
+  //   ).toISOString();
+  //   const expireRetry = new Date(
+  //     currentMs + this.configService.get('CONFIG_RETRY_BLOCK'),
+  //   ).toISOString();
+  //   const useAt = new Date(currentMs).toISOString();
 
-    if (!codeObject) {
-      await this.verificationCodeRepository.save({
-        phone,
-        code,
-        type,
-        expireAt,
-        expireRetry,
-        useAt,
-      });
-    }
+  //   if (!codeObject) {
+  //     await this.verificationCodeModel.save({
+  //       phone,
+  //       code,
+  //       type,
+  //       expireAt,
+  //       expireRetry,
+  //       useAt,
+  //     });
+  //   }
 
-    return code;
-  }
+  //   return code;
+  // }
 
-  async fetchRegisterCode(code: string) {
-    const codeObject = await this.verificationCodeRepository.findOne({
-      where: {
-        code,
-        status: VerificationCodeStatus.ACTIVE,
-        expireAt: MoreThan(new Date().toISOString()),
-      },
-      select: ['id', 'code', 'phone'],
-    });
+  // async fetchRegisterCode(code: string) {
+  //   const codeObject = await this.verificationCodeModel.findOne({
+  //     where: {
+  //       code,
+  //       status: VerificationCodeStatus.ACTIVE,
+  //       expireAt: MoreThan(new Date().toISOString()),
+  //     },
+  //     select: ['id', 'code', 'phone'],
+  //   });
 
-    if (!codeObject) {
-      throw new Exception(ErrorMessage.Verification_Code_Invalid);
-    }
+  //   if (!codeObject) {
+  //     throw new Exception(ErrorMessage.Verification_Code_Invalid);
+  //   }
 
-    await this.verificationCodeRepository.update(
-      { id: codeObject.id },
-      { status: VerificationCodeStatus.USED },
-    );
+  //   await this.verificationCodeModel.update(
+  //     { id: codeObject.id },
+  //     { status: VerificationCodeStatus.USED },
+  //   );
 
-    const registerToken = this.jwtAuthenticationService.generateRegisterToken({
-      code,
-      phone: codeObject.phone,
-    });
+  //   const registerToken = this.jwtAuthenticationService.generateRegisterToken({
+  //     code,
+  //     phone: codeObject.phone,
+  //   });
 
-    return { registerToken };
-  }
+  //   return { registerToken };
+  // }
 
   /**
    * Generate token & refresh token.
    */
   async generateToken(
-    memberRepository: Repository<Member>,
+    memberModel: Model<Member>,
     member: Member,
   ): Promise<{ token: string; refreshToken: string }> {
-    const payload = { id: member.id, userType: UserType.CLIENT };
+    const payload = { _id: member?._id, userType: UserType.CLIENT };
 
     const token = this.jwtAuthenticationService.generateAccessToken(payload);
 
@@ -248,7 +246,7 @@ export class AuthService {
       const newRefreshToken =
         this.jwtAuthenticationService.generateRefreshToken(payload);
 
-      await memberRepository.update(member.id, {
+      await memberModel.updateOne(member._id, {
         refreshToken: newRefreshToken,
       });
 
@@ -258,40 +256,38 @@ export class AuthService {
     return { token, refreshToken: member.refreshToken };
   }
 
-  async login({ phone, code }: LoginDto) {
-    return await this.dataSource.transaction(async (transaction) => {
-      const verificationCodeRepository =
-        transaction.getRepository(VerificationCode);
-      const memberRepository = transaction.getRepository(Member);
+  // async login({ phone, code }: LoginDto) {
+  //   return await this.connection.transaction(async (transaction) => {
+  //     const verificationCodeModel = transaction.getRepository(VerificationCode);
+  //     const memberModel = transaction.getRepository(Member);
 
-      const member = await memberRepository.findOne({
-        where: { phone },
-        select: ['id', 'phone', 'status', 'refreshToken'],
-      });
-      if (!member) {
-        throw new Exception(ErrorMessage.Phone_Not_Exists);
-      }
+  //     const member = await memberModel.findOne({
+  //       where: { phone },
+  //       select: ['id', 'phone', 'status', 'refreshToken'],
+  //     });
+  //     if (!member) {
+  //       throw new Exception(ErrorMessage.Phone_Not_Exists);
+  //     }
 
-      const codeObject = await this.checkVerificationCode(
-        verificationCodeRepository,
-        phone,
-        code,
-        VerificationCodeType.LOGIN,
-      );
+  //     const codeObject = await this.checkVerificationCode(
+  //       verificationCodeModel,
+  //       phone,
+  //       code,
+  //       VerificationCodeType.LOGIN,
+  //     );
 
-      await verificationCodeRepository.update(codeObject.id, {
-        status: VerificationCodeStatus.USED,
-        useAt: new Date().toISOString(),
-      });
+  //     await verificationCodeModel.update(codeObject.id, {
+  //       status: VerificationCodeStatus.USED,
+  //       useAt: new Date().toISOString(),
+  //     });
 
-      return this.generateToken(memberRepository, member);
-    });
-  }
+  //     return this.generateToken(memberModel, member);
+  //   });
+  // }
 
   async register({ registerToken, ...params }: RegisterDto) {
-    return await this.dataSource.transaction(async (transaction) => {
-      const memberRepository = transaction.getRepository(Member);
-
+    const transaction = await mongoose.startSession();
+    try {
       const payload =
         this.jwtAuthenticationService.verifyRegisterToken(registerToken);
       if (!payload) {
@@ -302,7 +298,7 @@ export class AuthService {
         throw new Exception(ErrorMessage.Register_Token_Expired);
       }
 
-      const member = await memberRepository.findOne({
+      const member = await this.memberModel.findOne({
         where: [{ phone: params.phone }],
         select: ['id', 'phone'],
       });
@@ -311,10 +307,19 @@ export class AuthService {
         throw new Exception(ErrorMessage.Phone_Already_Exists);
       }
 
-      const newMember = await memberRepository.save(params);
+      const newMember = await this.memberModel.create(params);
 
-      return this.generateToken(memberRepository, newMember);
-    });
+      const result = this.generateToken(this.memberModel, newMember);
+
+      await transaction.commitTransaction();
+
+      return result;
+    } catch (error) {
+      await transaction.abortTransaction();
+      throw error;
+    } finally {
+      await transaction.endSession();
+    }
   }
 
   async refreshToken(refreshToken: string): Promise<string> {
@@ -325,7 +330,7 @@ export class AuthService {
         'You have provided invalid refresh token',
       );
 
-    const user = await this.memberRepository.findOne({
+    const user = await this.memberModel.findOne({
       where: { id: payload.id },
       select: ['id', 'refreshToken'],
     });
@@ -335,7 +340,7 @@ export class AuthService {
         'Your refresh token changed, please login again',
       );
 
-    const result = await this.generateToken(this.memberRepository, user);
+    const result = await this.generateToken(this.memberModel, user);
     return result?.token;
   }
 }
